@@ -23,14 +23,6 @@ namespace Quiz
             base.Dispose(disposing);
         }
 
-        public void RunQuiz()
-        {
-            this.CurrentQuestionNumber = 0;
-
-            this.SetFieldsForCurrentItem();
-
-        }
-
         public void ShowResults()
         {
             this.InResultsMode = true;
@@ -47,7 +39,6 @@ namespace Quiz
             var pct = ((float)correct * 100) / (float)total;
 
             this.ResultsLabel.Text = $"Final Score: {correct} correct out of {total}.  {pct.ToString("F1")}%";
-//            this.ShowDialog();
         }
 
         private void SetTextBasedOnResults()
