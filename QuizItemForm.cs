@@ -108,6 +108,9 @@ namespace Quiz
         private void ExportButton_Click(object sender, EventArgs e)
         {
             var fails = this.QuizItems.Where(q => !q.WasAnsweredCorrectly).ToList();
+
+            fails = CheapCopy(fails);
+
             foreach(var fail in fails)
             {
                 foreach(var opt in fail.Options)
@@ -130,6 +133,13 @@ namespace Quiz
             var failFile = System.IO.Path.Combine(this.QuizFolder, "FailedItems.json");
             File.WriteAllText(failFile, json);
             MessageBox.Show($"Failures written to {failFile}" );
+        }
+
+        private List<QuizItem> CheapCopy(List<QuizItem> fails)
+        {
+            var json = JsonSerializer.Serialize(fails, new JsonSerializerOptions() { WriteIndented = true });
+            var copy = JsonSerializer.Deserialize<List<QuizItem>>(json);
+            return copy;
         }
     }
 }
