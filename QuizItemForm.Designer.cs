@@ -5,6 +5,9 @@ namespace Quiz
 {
     partial class QuizItemForm
     {
+        private const string CorrectIdentifierText = "Correct ==> ";
+        private const string IncorrectIdentifierText = "You Selected ==> ";
+
         /// <summary>
         /// Required designer variable.
         /// </summary>
@@ -32,6 +35,7 @@ namespace Quiz
             this.SetFieldsForCurrentItem();
 
             this.ResultsLabel.Visible = true;
+            this.ExportButton.Visible = true;
 
             var total = this.QuizItems.Count;
             var correct = this.QuizItems.Where(it => it.WasAnsweredCorrectly).Count();
@@ -49,8 +53,8 @@ namespace Quiz
                 {
                     var correctOption = qi.Options.First(op => op.IsAnswer);
                     var selectedOption = qi.Options.First(op => op.Option == qi.SelectedAnswer);
-                    correctOption.Option = "Correct ==> " + correctOption.Option;
-                    selectedOption.Option = "You Selected ==> " + selectedOption.Option;
+                    correctOption.Option = CorrectIdentifierText + correctOption.Option;
+                    selectedOption.Option = IncorrectIdentifierText + selectedOption.Option;
                 }
             }
         }
@@ -59,12 +63,19 @@ namespace Quiz
         {
             var item = this.QuizItems[this.CurrentQuestionNumber];
 
-            this.QuestionLabel.Text = item.Question;
+            this.QuestionTextbox.Text = item.Question;
             this.OptionsList.DataSource = item.Options;
             //            this.OptionsList.DataSource = item.Options.Select(op => op.Option).OrderBy(x => random.Next()).ToList();
             this.OptionsList.SelectedItems.Clear();
 
+            SetProgressLabel();
+
             SetColorForResult(item);
+        }
+
+        private void SetProgressLabel()
+        {
+            this.ProgressLabel.Text = $"{this.CurrentQuestionNumber+1}/{this.QuizItems.Count}";
         }
 
         private void SetColorForResult(QuizItem item)
@@ -91,35 +102,29 @@ namespace Quiz
         /// </summary>
         private void InitializeComponent()
         {
-            QuestionLabel = new Label();
             OptionsList = new ListBox();
             NextButton = new Button();
             ResultsLabel = new Label();
+            ProgressLabel = new Label();
+            QuestionTextbox = new TextBox();
+            ExportButton = new Button();
             SuspendLayout();
-            // 
-            // QuestionLabel
-            // 
-            QuestionLabel.AutoSize = true;
-            QuestionLabel.Location = new Point(14, 6);
-            QuestionLabel.Name = "QuestionLabel";
-            QuestionLabel.Size = new Size(125, 25);
-            QuestionLabel.TabIndex = 0;
-            QuestionLabel.Text = "QuestionLabel";
             // 
             // OptionsList
             // 
             OptionsList.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            OptionsList.Font = new Font("Segoe UI", 11F);
             OptionsList.FormattingEnabled = true;
-            OptionsList.ItemHeight = 25;
-            OptionsList.Location = new Point(12, 56);
+            OptionsList.ItemHeight = 30;
+            OptionsList.Location = new Point(12, 106);
             OptionsList.Name = "OptionsList";
-            OptionsList.Size = new Size(776, 204);
+            OptionsList.Size = new Size(974, 304);
             OptionsList.TabIndex = 1;
             // 
             // NextButton
             // 
             NextButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            NextButton.Location = new Point(14, 277);
+            NextButton.Location = new Point(14, 435);
             NextButton.Name = "NextButton";
             NextButton.Size = new Size(112, 34);
             NextButton.TabIndex = 2;
@@ -131,22 +136,57 @@ namespace Quiz
             // 
             ResultsLabel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             ResultsLabel.AutoSize = true;
-            ResultsLabel.Location = new Point(233, 282);
+            ResultsLabel.Location = new Point(477, 440);
             ResultsLabel.Name = "ResultsLabel";
             ResultsLabel.Size = new Size(67, 25);
             ResultsLabel.TabIndex = 3;
             ResultsLabel.Text = "Results";
             ResultsLabel.Visible = false;
             // 
+            // ProgressLabel
+            // 
+            ProgressLabel.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            ProgressLabel.AutoSize = true;
+            ProgressLabel.Location = new Point(148, 440);
+            ProgressLabel.Name = "ProgressLabel";
+            ProgressLabel.Size = new Size(81, 25);
+            ProgressLabel.TabIndex = 4;
+            ProgressLabel.Text = "Progress";
+            // 
+            // QuestionTextbox
+            // 
+            QuestionTextbox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            QuestionTextbox.Font = new Font("Segoe UI", 12F);
+            QuestionTextbox.Location = new Point(12, 12);
+            QuestionTextbox.Multiline = true;
+            QuestionTextbox.Name = "QuestionTextbox";
+            QuestionTextbox.ReadOnly = true;
+            QuestionTextbox.Size = new Size(974, 88);
+            QuestionTextbox.TabIndex = 5;
+            // 
+            // ExportButton
+            // 
+            ExportButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            ExportButton.Location = new Point(249, 435);
+            ExportButton.Name = "ExportButton";
+            ExportButton.Size = new Size(112, 34);
+            ExportButton.TabIndex = 6;
+            ExportButton.Text = "Export Fails";
+            ExportButton.UseVisualStyleBackColor = true;
+            ExportButton.Visible = false;
+            ExportButton.Click += ExportButton_Click;
+            // 
             // QuizItemForm
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 323);
+            ClientSize = new Size(998, 481);
+            Controls.Add(ExportButton);
+            Controls.Add(QuestionTextbox);
+            Controls.Add(ProgressLabel);
             Controls.Add(ResultsLabel);
             Controls.Add(NextButton);
             Controls.Add(OptionsList);
-            Controls.Add(QuestionLabel);
             Name = "QuizItemForm";
             Text = "QuizItemForm";
             ResumeLayout(false);
@@ -154,10 +194,11 @@ namespace Quiz
         }
 
         #endregion
-
-        private Label QuestionLabel;
         private ListBox OptionsList;
         private Button NextButton;
         private Label ResultsLabel;
+        private Label ProgressLabel;
+        private TextBox QuestionTextbox;
+        private Button ExportButton;
     }
 }
