@@ -61,16 +61,18 @@ namespace Quiz
 
         private void SetFieldsForCurrentItem()
         {
-            var item = this.QuizItems[this.CurrentQuestionNumber];
+            if(this.CurrentQuestionNumber < this.QuizItems.Count)
+            {
+                var item = this.QuizItems[this.CurrentQuestionNumber];
 
-            this.QuestionTextbox.Text = item.Question;
-            this.OptionsList.DataSource = item.Options;
-            //            this.OptionsList.DataSource = item.Options.Select(op => op.Option).OrderBy(x => random.Next()).ToList();
-            this.OptionsList.SelectedItems.Clear();
+                this.QuestionTextbox.Text = item.Question;
+                this.OptionsList.DataSource = item.Options;
+                this.OptionsList.SelectedItems.Clear();
 
-            SetProgressLabel();
+                SetProgressLabel();
 
-            SetColorForResult(item);
+                SetColorForResult(item);
+            }
         }
 
         private void SetProgressLabel()
@@ -90,6 +92,10 @@ namespace Quiz
                 {
                     this.OptionsList.BackColor = Color.LightPink;
                 }
+            }
+            else
+            {
+                this.OptionsList.BackColor = Color.White;
             }
         }
 

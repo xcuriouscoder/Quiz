@@ -90,7 +90,7 @@ namespace Quiz
 
                 if (this.CurrentQuestionNumber == QuizItems.Count - 1 && this.InResultsMode)
                 {
-                    this.NextButton.Text = "Close";
+                    this.NextButton.Text = "Retry Failures";
                 }
 
             }
@@ -101,25 +101,41 @@ namespace Quiz
             }
             else
             {
-                this.Close();
+                this.NextButton.Text = "Next";
+                this.CurrentQuestionNumber = 0;
+                this.QuizItems = ResetFailureToBeRunnable();
+                this.InResultsMode = false;
+                this.SetFieldsForCurrentItem();
+
+                //                this.Close();
             }
         }
 
         private void ExportButton_Click(object sender, EventArgs e)
         {
+            List<QuizItem> fails = ResetFailureToBeRunnable();
+
+            var json = JsonSerializer.Serialize(fails, new JsonSerializerOptions() { WriteIndented = true });
+            var failFile = System.IO.Path.Combine(this.QuizFolder, "FailedItems.json");
+            File.WriteAllText(failFile, json);
+            MessageBox.Show($"Failures written to {failFile}");
+        }
+
+        private List<QuizItem> ResetFailureToBeRunnable()
+        {
             var fails = this.QuizItems.Where(q => !q.WasAnsweredCorrectly).ToList();
 
             fails = CheapCopy(fails);
 
-            foreach(var fail in fails)
+            foreach (var fail in fails)
             {
-                foreach(var opt in fail.Options)
+                foreach (var opt in fail.Options)
                 {
-                    if(opt.IsAnswer)
+                    if (opt.IsAnswer)
                     {
                         opt.Option = opt.Option.Replace(CorrectIdentifierText, "");
                     }
-                    else if(opt.Option.StartsWith(IncorrectIdentifierText))
+                    else if (opt.Option.StartsWith(IncorrectIdentifierText))
                     {
                         opt.Option = opt.Option.Replace(IncorrectIdentifierText, "");
                     }
@@ -129,10 +145,7 @@ namespace Quiz
                 fail.WasAnsweredCorrectly = false;
             }
 
-            var json = JsonSerializer.Serialize(fails, new JsonSerializerOptions() { WriteIndented = true });
-            var failFile = System.IO.Path.Combine(this.QuizFolder, "FailedItems.json");
-            File.WriteAllText(failFile, json);
-            MessageBox.Show($"Failures written to {failFile}" );
+            return fails;
         }
 
         private List<QuizItem> CheapCopy(List<QuizItem> fails)
